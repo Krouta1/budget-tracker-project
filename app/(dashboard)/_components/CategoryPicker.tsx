@@ -115,6 +115,8 @@ const CategoryPicker = ({ type, onChange }: Props) => {
   );
 };
 
+export default CategoryPicker;
+
 function CategoryRow({ category }: { category: Category }) {
   return (
     <div className='flex items-center gap-2'>
@@ -123,5 +125,3 @@ function CategoryRow({ category }: { category: Category }) {
     </div>
   );
 }
-
-export default CategoryPicker;

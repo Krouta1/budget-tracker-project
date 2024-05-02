@@ -54,6 +54,8 @@ const CategoriesStats = ({ userSettings, from, to }: Props) => {
   );
 };
 
+export default CategoriesStats;
+
 function CategoriesCard({
   formatter,
   type,
@@ -121,5 +123,3 @@ function CategoriesCard({
     </Card>
   );
 }
-
-export default CategoriesStats;

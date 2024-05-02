@@ -71,6 +71,8 @@ const StatsCards = ({ userSettings, from, to }: Props) => {
   );
 };
 
+export default StatsCards;
+
 function StatCard({
   formatter,
   value,
@@ -105,5 +107,3 @@ function StatCard({
     </Card>
   );
 }
-
-export default StatsCards;
