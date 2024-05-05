@@ -8,7 +8,7 @@ export async function GET (request: Request) {
     const user = await currentUser();
     if (!user) redirect('/sign-in');
 
-    const period = getHistoryPeriod(user.id)
+    const period = await getHistoryPeriod(user.id)
     return Response.json(period);
 }
 

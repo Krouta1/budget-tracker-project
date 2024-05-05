@@ -34,7 +34,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { CircleOff, Loader2, PlusSquareIcon } from 'lucide-react';
 
-import React, { useCallback, useState } from 'react';
+import React, { ReactNode, useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
@@ -47,9 +47,10 @@ import { useTheme } from 'next-themes';
 type Props = {
   type: TransactionType;
   onSuccessCallback: (category: Category) => void;
+  trigger?: ReactNode;
 };
 
-const CreateCategoryDialog = ({ type, onSuccessCallback }: Props) => {
+const CreateCategoryDialog = ({ type, onSuccessCallback, trigger }: Props) => {
   //this is mainly for theme of emoji picker
   const theme = useTheme();
 
@@ -102,13 +103,17 @@ const CreateCategoryDialog = ({ type, onSuccessCallback }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant={'ghost'}
-          className='flex border-separate items-center justify-start rounded-none border-b px-3 py-3 text-muted-foreground'
-        >
-          <PlusSquareIcon className='mr-2 w-4 h-4' />
-          Create new category
-        </Button>
+        {trigger ? (
+          trigger
+        ) : (
+          <Button
+            variant={'ghost'}
+            className='flex border-separate items-center justify-start rounded-none border-b px-3 py-3 text-muted-foreground'
+          >
+            <PlusSquareIcon className='mr-2 w-4 h-4' />
+            Create new category
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
