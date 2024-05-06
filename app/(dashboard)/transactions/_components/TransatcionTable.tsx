@@ -30,6 +30,23 @@ import { cn } from '@/lib/utils';
 import { DataTableFacetedFilter } from '@/components/DataTable/FacetedFilters';
 import { DataTableViewOptions } from '@/components/DataTable/ColumnToggle';
 import { DataTablePagination } from '@/components/DataTable/Pagination';
+import { download, generateCsv, mkConfig } from 'export-to-csv';
+import { Button } from '@/components/ui/button';
+import {
+  DownloadIcon,
+  MoreHorizontal,
+  MoreHorizontalIcon,
+  TrashIcon,
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import DeleteTransactionDialog from './DeleteTransactionDialog';
 
 type Props = {
   from: Date;
@@ -108,7 +125,18 @@ export const columns: ColumnDef<TransactionHistoryRow>[] = [
       </p>
     ),
   },
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }) => <RowActions transaction={row.original} />,
+  },
 ];
+
+const csvConfig = mkConfig({
+  fieldSeparator: ',',
+  decimalSeparator: '.',
+  useKeysAsHeaders: true,
+});
 
 const TransatcionTable = ({ from, to }: Props) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -125,6 +153,11 @@ const TransatcionTable = ({ from, to }: Props) => {
       return response.json();
     },
   });
+
+  const handleExsportCsv = (data: any[]) => {
+    const csv = generateCsv(csvConfig)(data);
+    download(csvConfig)(csv);
+  };
 
   const emptyData: any[] = [];
   const table = useReactTable({
@@ -184,6 +217,26 @@ const TransatcionTable = ({ from, to }: Props) => {
           )}
         </div>
         <div className=' flex flex-wrap gap-2'>
+          <Button
+            variant={'outline'}
+            size={'sm'}
+            className='ml-auto h-8 lg:flex'
+            onClick={() => {
+              const data = table.getFilteredRowModel().rows.map((row) => ({
+                category: row.original.category,
+                description: row.original.description,
+                date: row.original.date,
+                type: row.original.type,
+                amount: row.original.amount,
+                formattedAmount: row.original.formattedAmount,
+                categoryIcon: row.original.categoryIcon,
+              }));
+              handleExsportCsv(data);
+            }}
+          >
+            <DownloadIcon className='w-4 h-4 mr-2' />
+            Export CSV
+          </Button>
           <DataTableViewOptions table={table} />
         </div>
       </div>
@@ -247,3 +300,38 @@ const TransatcionTable = ({ from, to }: Props) => {
 };
 
 export default TransatcionTable;
+
+function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  return (
+    <>
+      <DeleteTransactionDialog
+        open={showDeleteDialog}
+        setOpen={setShowDeleteDialog}
+        transactionId={transaction.id}
+      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant={'ghost'} className=' h-8 w-8 p-0'>
+            <span className='sr-only'>Open menu</span>
+            <MoreHorizontalIcon className='w-4 h-4' />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end'>
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className='flex items-center gap-2'
+            onSelect={() => {
+              setShowDeleteDialog((prev) => !prev);
+            }}
+          >
+            <TrashIcon className='w-4 h-4 text-muted-foreground' />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
+}
